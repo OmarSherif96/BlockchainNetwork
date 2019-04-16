@@ -3,6 +3,6 @@
 
 To build the network run "sh network-build.sh" in your terminal
 
-##Clearing network 
+## Clearing network 
 
 to clear the network run "sh network-clear.sh" 

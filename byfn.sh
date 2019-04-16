@@ -158,13 +158,13 @@ function networkUp() {
   fi
   if [ "${IF_COUCHDB}" == "couchdb" ]; then
     if [ "$CONSENSUS_TYPE" == "kafka" ]; then
-      IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH up -d 2>&1
+      IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA up -d 2>&1
       docker ps -a
     elif  [ "$CONSENSUS_TYPE" == "etcdraft" ]; then
-      IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_RAFT2 -f $COMPOSE_FILE_COUCH up -d 2>&1
+      IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_RAFT2 -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA up -d 2>&1
       docker ps -a
     else
-      IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH up -d 2>&1
+      IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA up -d 2>&1
       docker ps -a
     fi
   else
@@ -223,9 +223,9 @@ function upgradeNetwork() {
     export IMAGE_TAG=$IMAGETAG
     if [ "${IF_COUCHDB}" == "couchdb" ]; then
       if [ "$CONSENSUS_TYPE" == "kafka" ]; then
-        COMPOSE_FILES="-f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH"
+        COMPOSE_FILES="-f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA"
       elif [ "$CONSENSUS_TYPE" == "etcdraft" ]; then
-        COMPOSE_FILES="-f $COMPOSE_FILE -f $COMPOSE_FILE_RAFT2 -f $COMPOSE_FILE_COUCH"
+        COMPOSE_FILES="-f $COMPOSE_FILE -f $COMPOSE_FILE_RAFT2 -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA"
       else
         COMPOSE_FILES="-f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH"
       fi
@@ -283,7 +283,7 @@ function upgradeNetwork() {
 function networkDown() {
   # stop qnb containers also in addition to cib and hsbc, in case we were running sample to add qnb
   # stop kafka and zookeeper containers in case we're running with kafka consensus-type
-  docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_RAFT2 -f $COMPOSE_FILE_ORG3 down --volumes --remove-orphans
+  docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_RAFT2 -f $COMPOSE_FILE_CA -f $COMPOSE_FILE_ORG3 down --volumes --remove-orphans
 
   # Don't remove the generated artifacts -- note, the ledgers are always removed
   if [ "$MODE" != "restart" ]; then
@@ -517,6 +517,8 @@ CHANNEL_NAME="tolbachannel"
 COMPOSE_FILE=docker-compose-cli.yaml
 #
 COMPOSE_FILE_COUCH=docker-compose-couch.yaml
+#CA compose file
+COMPOSE_FILE_CA=docker-compose-e2e.yaml
 # qnb docker compose file
 COMPOSE_FILE_ORG3=docker-compose-qnb.yaml
 # kafka and zookeeper compose file

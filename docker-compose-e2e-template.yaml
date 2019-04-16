@@ -108,7 +108,7 @@ services:
     networks:
       - byfn
 
- peer0.qnb.tolba.com:
+  peer0.qnb.tolba.com:
     container_name: peer0.qnb.tolba.com
     extends:
       file:  base/docker-compose-base.yaml

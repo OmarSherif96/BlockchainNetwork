@@ -1,0 +1,114 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+volumes:
+  orderer.tolba.com:
+  peer0.cib.tolba.com:
+  peer1.cib.tolba.com:
+  peer0.hsbc.tolba.com:
+  peer1.hsbc.tolba.com:
+  peer0.qnb.tolba.com:
+  peer1.qnb.tolba.com:
+
+networks:
+  byfn:
+
+services:
+
+  orderer.tolba.com:
+    extends:
+      file:   base/docker-compose-base.yaml
+      service: orderer.tolba.com
+    container_name: orderer.tolba.com
+    networks:
+      - byfn
+
+  peer0.cib.tolba.com:
+    container_name: peer0.cib.tolba.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.cib.tolba.com
+    networks:
+      - byfn
+
+  peer1.cib.tolba.com:
+    container_name: peer1.cib.tolba.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.cib.tolba.com
+    networks:
+      - byfn
+
+  peer0.hsbc.tolba.com:
+    container_name: peer0.hsbc.tolba.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.hsbc.tolba.com
+    networks:
+      - byfn
+
+  peer1.hsbc.tolba.com:
+    container_name: peer1.hsbc.tolba.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.hsbc.tolba.com
+    networks:
+      - byfn
+
+  peer0.qnb.tolba.com:
+    container_name: peer0.qnb.tolba.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.qnb.tolba.com
+    networks:
+      - byfn
+
+  peer1.qnb.tolba.com:
+    container_name: peer1.qnb.tolba.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.qnb.tolba.com
+    networks:
+      - byfn
+
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:1.4
+    tty: true
+    stdin_open: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.cib.tolba.com:7051
+      - CORE_PEER_LOCALMSPID=CIBMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/cib.tolba.com/peers/peer0.cib.tolba.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/cib.tolba.com/peers/peer0.cib.tolba.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/cib.tolba.com/peers/peer0.cib.tolba.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/cib.tolba.com/users/Admin@cib.tolba.com/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - orderer.tolba.com
+      - peer0.cib.tolba.com
+      - peer1.cib.tolba.com
+      - peer0.hsbc.tolba.com
+      - peer1.hsbc.tolba.com
+      - peer0.qnb.tolba.com
+      - peer1.qnb.tolba.com
+    networks:
+      - byfn
